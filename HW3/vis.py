@@ -42,23 +42,23 @@ menu = [("Fresh","Fresh"), ("Milk", "Milk"), ("Grocery","Grocery" ), ("Frozen", 
 ddx = Dropdown(label="Select x-axis", button_type="primary", menu=menu, height=25, width=110)
 ddy = Dropdown(label="Select y-axis", button_type="primary", menu=menu, height=25, width=110)
 
-menu = [("K-Means", "0"), ("DBSCAN", "1"), ("Hierarchical", "2")]
-
-pempty1 = figure(width=800, height=300, active_scroll="wheel_zoom")
-pempty2 = figure(width=800, height=300, active_scroll="wheel_zoom")
-
 select_channel = Select(title="Channel:", value="All", options=["All", "1", "2"], height=25, width=110)
 select_region = Select(title="Region:", value="All", options=["All", "1", "2", "3"], height=25, width=110)
 
-#widget_box_axes = widgetbox(ddx,ddy)
+#empty plot placeholders
+pempty1 = figure(width=800, height=300, active_scroll="wheel_zoom")
+pempty2 = figure(width=800, height=300, active_scroll="wheel_zoom")
+
 widget_box_axes = row(widgetbox(ddx), widgetbox(ddy), widgetbox(select_channel), widgetbox(select_region))  
 
+#first clustering plot
 empty1 = PreText(text="""\n\nK-Means """, height=50, width=200)
 
 slider_cluster = Slider(start=1, end=10, value=1, step=1, title="No. of clusters", width=200)
 button_k = Button(label="Evaluate", width=100, button_type="success")
 widget_box_k_means = widgetbox(empty1, slider_cluster, button_k)
 
+#second clustering plot
 empty2 = PreText(text="""\nWard Agglomerative \nClustering""", height=50, width=200)
 
 slider_n_neigh = Slider(start=5, end=100, value=5, step=5, title="N-neighbours", width=200)
@@ -66,15 +66,15 @@ slider_cluster_ward = Slider(start=2, end=10, value=2, step=1, title="No. of clu
 button_ward = Button(label="Evaluate", width=100, button_type="success")
 widget_box_ward = widgetbox(empty2, slider_n_neigh, slider_cluster_ward, button_ward)
 
-#l = layout([heading],[[[ddx,ddy],[ddclus]],pempty])
+#build layout
 l = layout([heading],[widget_box_axes],[widget_box_k_means,pempty1], [widget_box_ward,pempty2])
 
 doc.add_root(l)
 
+#on k-means button press
 def cb_bt_kmeans():
     df1 = get_data()
     
-    #print("Button event")
     f1 = df1[xval].values
     f2 = df1[yval].values
     
@@ -93,19 +93,14 @@ def cb_bt_kmeans():
     
     df1.clusters.replace(to_replace=label_colors, inplace=True)
     
+    #get centroids and add to dataframe
     cent = k_means.cluster_centers_
-    
-    #print(cent)
     
     a = [row[0] for row in cent]
     b = [i[1] for i in cent]
     
-    print(a, b)
-    
     df1['centroid_x'] = pd.Series(a)
     df1['centroid_y'] = pd.Series(b)
-    
-    print(df1)
     
     src1 = ColumnDataSource(df1)
     
@@ -114,14 +109,9 @@ def cb_bt_kmeans():
     
     p1.circle_x(x='centroid_x', y='centroid_y', color='Red', legend='k-means centroid', size=12, source=src1 )
     
-    #paramVal = Label(x=70, y=(max_y - (0.1 * max_y)), text='Inertia - ' + str(k_means.inertia_))
-
-    #p1.add_layout(paramVal)
-    
     #p1.legend.orientation = "horizontal"
     #p1.legend.click_policy = "hide"
 
-    #print(l.children)
     l.children[2].children[1] = p1
     
 def cb_bt_ward():
@@ -187,13 +177,13 @@ def cb_bt_dbscan():
     
     colors = inferno(n_clusters)
     
-    print(colors)
+    #print(colors)
     
     label_colors = {}
     for p in range(0,n_clusters) :
         label_colors[p] = colors[p]
     
-    print(label_colors)
+    #print(label_colors)
     
     df1.clusters.replace(to_replace=label_colors, inplace=True)
     
@@ -216,8 +206,7 @@ def get_data():
         df1 = df1[df1['Region'] == int(sel_region)]
     
     df1.reset_index(drop=True, inplace=True)
-    
-    print(df1.shape)    
+       
     return df1
     
 #when user selects an item from the dropdown
