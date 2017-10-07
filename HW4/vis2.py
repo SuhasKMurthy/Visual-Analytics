@@ -165,11 +165,13 @@ def plot():
         
     source = ColumnDataSource(df1)
     
-    p1 = figure(plot_width=800, plot_height=500, title=xval + " vs " + yval, x_axis_label=xval, y_axis_label=yval)
-    p1.annulus(x=xval, y=yval,color='cancer', inner_radius=0.1, outer_radius=2, line_color="white", legend='Cancer', source=source, alpha=0.6)
-    p1.annulus(x=xval, y=yval,color='diabetes', inner_radius=2, outer_radius=4,
+    
+    p1 = figure(plot_width=800, plot_height=500, title=xval + " vs " + yval, 
+                x_axis_label=xval, y_axis_label=yval)
+    p1.annulus(x=xval, y=yval,color='cancer', inner_radius=0.1, outer_radius=3, line_color="white", legend='Cancer', source=source, alpha=0.6)
+    p1.annulus(x=xval, y=yval,color='diabetes', inner_radius=3, outer_radius=6,
                line_color="white", source=source, legend='Diabetes', alpha=0.6)
-    p1.annulus(x=xval, y=yval,color='heart_disease', inner_radius=4, outer_radius=6,
+    p1.annulus(x=xval, y=yval,color='heart_disease', inner_radius=6, outer_radius=9,
                line_color="white", legend='Heart Disease', source=source, alpha=0.6)
     
     p1.legend.orientation = "horizontal"
@@ -207,7 +209,13 @@ def plot():
     #p1 = figure(plot_width=800, plot_height=400, title=xval + " vs " + yval, x_axis_label=xval, y_axis_label=yval)
     p1.x(x=xval, y=yval,size=7,color='clusters', source=src1, alpha=1)
     
-    p1.triangle(x='centroid_x', y='centroid_y', color='Red', legend='k-means centroid', size=12, source=src1 )
+    imp2 = p1.triangle(x='centroid_x', y='centroid_y', color='Red', 
+                       legend='k-means centroid', size=12, source=src1 )
+    
+    p1.add_tools(HoverTool(renderers=[imp2], tooltips=[
+        ('K-Means Centroid X Coordinate',  '@centroid_x' ),
+        ('K-Means Centroid Y Coordinate',  '@centroid_y')
+    ]))
     
     l.children[2].children[1] = p1
 
